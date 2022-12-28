@@ -1,6 +1,8 @@
 import requests
 import os
+
 from pprint import pprint
+from sys import argv
 
 
 url_base = "https://api.streamelements.com/kappa/v2/"
@@ -28,10 +30,13 @@ def get_command(jwt, headers, channel_id, command_name):
 
 def update_command(jwt, headers, channel_id, command):
     url = url_base + f"bot/commands/{channel_id}/{command['_id']}"
-    if command["enabledOnline"]:
-        command["enabledOnline"] = False
+    if set(argv) & set(["--enable", "--disable"]):
+        command["enabledOnline"] = False if "--disable" in argv else True
     else:
-        command["enabledOnline"] = True
+        if command["enabledOnline"]:
+            command["enabledOnline"] = False
+        else:
+            command["enabledOnline"] = True
     r = requests.put(url=url, json=command, headers=headers).json()
     return r
 
