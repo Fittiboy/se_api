@@ -1,8 +1,9 @@
 import requests
+from pprint import pprint
 
 
 url_base = "https://api.streamelements.com/kappa/v2/"
-header_base = {
+headers_base = {
     "Accept": "application/json",
     "Content-Type": "application/json",
 }
@@ -10,19 +11,16 @@ header_base = {
 
 def get_channels(jwt, headers):
     url = url_base + "users/access"
-    headers = headers_base
+    r = requests.get(url=url, headers=headers).json()
+    pprint(r)
 
 
 def get_commands(jwt, headers, channel_id):
     url = url_base + f"bot/commands/{channel_id}"
-    headers = {
-        "Accept": "application/json",
-        "Authorization": f"Bearer {jwt}",
-        "Content-Type": "application/json"
-    }
 
 
 if __name__ == "__main__":
-    jwt = input("JWT: ")
-    headers_updates = headers_base
-    headers["Authorization"] = f"Bearer {jwt}"
+    jwt = input("JWT: ").strip("\"")
+    headers_updated = headers_base
+    headers_updated["Authorization"] = f"Bearer {jwt}"
+    get_channels(jwt, headers_updated)
