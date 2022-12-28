@@ -25,6 +25,15 @@ def get_command(jwt, headers, channel_id, command_name):
             return result
 
 
+def update_command(jwt, headers, channel_id, command):
+    url = url_base + f"bot/commands/{channel_id}/{command['_id']}"
+    del command["_id"], command["createdAt"], command["updatedAt"]
+    pprint(command)
+    command["enabledOnline"] = True
+    r = requests.put(url=url, data=command, headers=headers).json()
+    return r
+
+
 if __name__ == "__main__":
     jwt = input("JWT: ").strip("\"")
     headers = headers_base
@@ -33,4 +42,5 @@ if __name__ == "__main__":
     command_name = "fishinge"
     channel_id = get_channel_id(jwt, headers, channel_name)
     command = get_command(jwt, headers, channel_id, command_name)
-    pprint(command)
+    response = update_command(jwt, headers, channel_id, command)
+    pprint(response)
