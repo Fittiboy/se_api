@@ -1,4 +1,5 @@
 import requests
+import os
 from pprint import pprint
 
 
@@ -27,15 +28,17 @@ def get_command(jwt, headers, channel_id, command_name):
 
 def update_command(jwt, headers, channel_id, command):
     url = url_base + f"bot/commands/{channel_id}/{command['_id']}"
-    del command["_id"], command["createdAt"], command["updatedAt"]
-    pprint(command)
     command["enabledOnline"] = True
-    r = requests.put(url=url, data=command, headers=headers).json()
+    r = requests.put(url=url, json=command, headers=headers).json()
     return r
 
 
 if __name__ == "__main__":
-    jwt = input("JWT: ").strip("\"")
+    try:
+        jwt = os.environ["SE_KEY"]
+    except KeyError:
+        jwt = input("JWT: ")
+    jwt = jwt.strip("\"")
     headers = headers_base
     headers["Authorization"] = f"Bearer {jwt}"
     channel_name = "chobo"
