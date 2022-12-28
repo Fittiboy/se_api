@@ -14,22 +14,26 @@ headers_base = {
 
 def get_channel_id(jwt, headers, channel_name):
     url = url_base + "users/access"
-    r = requests.get(url=url, headers=headers).json()
-    for result in r:
+    r = requests.get(url=url, headers=headers)
+    r.raise_for_status()
+    for result in r.json():
         if result["username"] == channel_name:
             return result["channelId"]
 
 
 def get_command(jwt, headers, channel_id, command_name):
     url = url_base + f"bot/commands/{channel_id}"
-    r = requests.get(url=url, headers=headers).json()
-    for result in r:
+    r = requests.get(url=url, headers=headers)
+    r.raise_for_status()
+    for result in r.json():
         if result["command"] == command_name:
             return result
 
 
-def update_command(jwt, headers, channel_id, command):
+def update_command(jwt, headers, channel_id, command_name):
+    command = get_command(jwt, headers, channel_id, command_name)
     url = url_base + f"bot/commands/{channel_id}/{command['_id']}"
+
     if set(argv) & set(["--enable", "--disable"]):
         command["enabledOnline"] = False if "--disable" in argv else True
     else:
@@ -37,8 +41,10 @@ def update_command(jwt, headers, channel_id, command):
             command["enabledOnline"] = False
         else:
             command["enabledOnline"] = True
-    r = requests.put(url=url, json=command, headers=headers).json()
-    return r
+    r = requests.put(url=url, json=command, headers=headers)
+    r.raise_for_status()
+
+    return r.json()
 
 
 if __name__ == "__main__":
@@ -52,6 +58,5 @@ if __name__ == "__main__":
     channel_name = "chobo"
     command_name = "fishinge"
     channel_id = get_channel_id(jwt, headers, channel_name)
-    command = get_command(jwt, headers, channel_id, command_name)
-    response = update_command(jwt, headers, channel_id, command)
+    response = update_command(jwt, headers, channel_id, command_name)
     pprint(response)
