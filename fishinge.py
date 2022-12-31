@@ -2,6 +2,7 @@ import requests
 import os
 
 from pprint import pprint
+from time import sleep
 from sys import argv
 
 
@@ -36,13 +37,22 @@ def update_command(jwt, headers, channel_id, command_name):
 
     if set(argv) & set(["--enable", "--disable"]):
         command["enabledOnline"] = False if "--disable" in argv else True
+    elif "--timer" in argv:
+        command["enabledOnline"] = True
+        r = requests.put(url=url, json=command, headers=headers)
+        r.raise_for_status()
+        pprint(r.json())
+        sleep(300)
+        command["enabledOnline"] = False
+        r = requests.put(url=url, json=command, headers=headers)
+        r.raise_for_status()
     else:
         if command["enabledOnline"]:
             command["enabledOnline"] = False
         else:
             command["enabledOnline"] = True
-    r = requests.put(url=url, json=command, headers=headers)
-    r.raise_for_status()
+        r = requests.put(url=url, json=command, headers=headers)
+        r.raise_for_status()
 
     return r.json()
 
