@@ -61,7 +61,11 @@ if __name__ == "__main__":
     try:
         jwt = os.environ["SE_KEY"]
     except KeyError:
-        jwt = input("JWT: ")
+        try:
+            with open("token.txt") as token_file:
+                jwt = token_file.read().strip()
+        except FileNotFoundError:
+            jwt = input("JWT: ")
     jwt = jwt.strip("\"")
     headers = headers_base
     headers["Authorization"] = f"Bearer {jwt}"
